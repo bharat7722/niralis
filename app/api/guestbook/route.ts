@@ -1,5 +1,6 @@
 import { NextResponse, connection } from "next/server";
 import { addGuestbookEntry, listGuestbook, type GuestbookEntry } from "@/lib/store";
+import { appendToSheet } from "@/lib/sheets";
 
 function clean(value: unknown, max: number): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -37,6 +38,24 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
   };
 
-  await addGuestbookEntry(entry);
-  return NextResponse.json({ ok: true, entry }, { status: 201 });
+  // Same two stores as the RSVP route, for the same reason: the file store is
+  // development-only, so in production the sheet is what actually keeps a wish.
+  const savedLocally = await addGuestbookEntry(entry);
+
+  const sheet = await appendToSheet("Guestbook", {
+    submittedAt: entry.createdAt,
+    name: entry.name,
+    message: entry.message,
+    id: entry.id,
+  });
+
+  if (!savedLocally && sheet !== "appended") {
+    console.error(`[guestbook] nowhere to record ${entry.name}: sheet=${sheet}`);
+    return NextResponse.json(
+      { error: "We could not save your wish just now. Please try again in a moment." },
+      { status: 503 },
+    );
+  }
+
+  return NextResponse.json({ ok: true, entry, sheet }, { status: 201 });
 }

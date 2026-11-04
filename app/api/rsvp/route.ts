@@ -39,10 +39,10 @@ export async function POST(request: Request) {
     createdAt: new Date().toISOString(),
   };
 
-  // Saved locally first, and that is what makes the reply recorded. The sheet
-  // is a mirror for the couple to work from; a guest who pressed Send must
-  // never be told their RSVP failed because a Google script was slow.
-  await addRsvp(rsvp);
+  // Both stores are attempted, and neither may throw. The file store only
+  // works in development — a serverless filesystem is read-only — so in
+  // production the sheet is the record and this is a no-op.
+  const savedLocally = await addRsvp(rsvp);
 
   const sheet = await appendToSheet("RSVP", {
     submittedAt: rsvp.createdAt,
@@ -56,8 +56,18 @@ export async function POST(request: Request) {
     id: rsvp.id,
   });
 
-  // Reported so the couple can tell a quiet sheet from an empty one, and so a
-  // failed mirror is visible in logs rather than silent. The guest's reply is
-  // recorded either way, so this never changes the status code.
+  // If nothing captured the reply, say so. Returning 201 here would show the
+  // guest a thank-you for an RSVP that reached no one — the one outcome worth
+  // failing loudly for.
+  if (!savedLocally && sheet !== "appended") {
+    console.error(`[rsvp] nowhere to record ${rsvp.name}: sheet=${sheet}`);
+    return NextResponse.json(
+      { error: "We could not save your reply just now. Please try again in a moment." },
+      { status: 503 },
+    );
+  }
+
+  // Otherwise it is recorded. `sheet` is reported so a quiet sheet can be told
+  // apart from an empty one.
   return NextResponse.json({ ok: true, rsvp, sheet }, { status: 201 });
 }
