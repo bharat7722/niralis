@@ -1,4 +1,3 @@
-import ShareInvite from "@/components/share-invite";
 import { site } from "@/lib/site";
 import Ornament from "@/components/ornament";
 
@@ -17,7 +16,6 @@ export default function SiteFooter() {
         <p className="mt-6 text-[11px] text-muted-foreground/70">
           We can’t wait to celebrate with you.
         </p>
-        <ShareInvite />
       </div>
     </footer>
   );

@@ -85,8 +85,6 @@ export default function InlayMosaic({ src, alt }: { src: string; alt: string }) 
             );
           })}
         </div>
-
-        <p className="mt-6 text-xs text-muted-foreground">Scroll to turn the stone.</p>
       </div>
     </section>
   );

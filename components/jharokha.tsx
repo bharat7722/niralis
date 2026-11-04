@@ -113,9 +113,6 @@ export default function Jharokha() {
           </div>
         </div>
 
-        <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-          Scroll to open the window.
-        </p>
       </div>
     </section>
   );

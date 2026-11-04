@@ -48,7 +48,11 @@ export default function PageTransition({ children }: { children: React.ReactNode
       }, 0);
 
       const heading = node.querySelector("h1");
-      if (heading) {
+      // The hero choreographs its own entrance. Reaching into it from here
+      // picked up the <h1> holding the groom's name and nothing else — the
+      // bride's line is a <p> — so the pair came apart on every return to
+      // the home page.
+      if (heading && !heading.closest("[data-hero='content']")) {
         // The kicker above the title comes with it, so the pair reads as one unit.
         const cluster = [heading.previousElementSibling, heading].filter(
           (element): element is Element => element instanceof Element,

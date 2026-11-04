@@ -65,9 +65,26 @@ export default function Hero() {
         alreadySeen = false;
       }
 
-      // The overture is a first-impression, not something to sit through on
-      // every return to the home page.
-      if (reduced || alreadySeen) return;
+      if (reduced) return;
+
+      // The full overture is a first impression, not something to sit through
+      // on every return to the home page — but arriving to a dead hero is
+      // worse. Coming back plays a short reprise instead, and crucially it
+      // carries both names: the page-level transition can only reach the
+      // <h1>, which would animate the groom's line alone.
+      if (alreadySeen) {
+        gsap
+          .timeline({ defaults: { ease: "power3.out", duration: 0.7 } })
+          .from("[data-hero='kicker'] [data-char]", { y: 12, opacity: 0, stagger: 0.015 }, 0)
+          .from("[data-hero='groom'] [data-char]", { y: 26, opacity: 0, stagger: 0.028 }, 0.08)
+          .from("[data-hero='amp']", { scale: 0.6, opacity: 0, duration: 0.55 }, 0.2)
+          .from("[data-hero='bride'] [data-char]", { y: 26, opacity: 0, stagger: 0.028 }, 0.26)
+          .fromTo("[data-hero='rule']", { scaleX: 0 }, { scaleX: 1, duration: 0.6 }, 0.42)
+          .from("[data-hero='meta']", { y: 10, opacity: 0, duration: 0.6 }, 0.5)
+          .from("[data-hero='tag']", { y: 10, opacity: 0, duration: 0.6 }, 0.58);
+        return;
+      }
+
       try {
         sessionStorage.setItem(OVERTURE_KEY, "1");
       } catch {
@@ -101,8 +118,7 @@ export default function Hero() {
         )
         .fromTo("[data-hero='rule']", { scaleX: 0 }, { scaleX: 1, duration: 1.1 }, 2.15)
         .from("[data-hero='meta']", { y: 16, opacity: 0, duration: 0.85 }, 2.35)
-        .from("[data-hero='tag']", { y: 14, opacity: 0, duration: 0.85 }, 2.55)
-        .from("[data-hero='cue']", { y: 12, opacity: 0, duration: 0.9 }, 2.8);
+        .from("[data-hero='tag']", { y: 14, opacity: 0, duration: 0.85 }, 2.55);
     }, node);
 
     return () => ctx.revert();
@@ -162,16 +178,6 @@ export default function Hero() {
         </p>
       </div>
 
-      <div
-        data-hero="cue"
-        aria-hidden="true"
-        className="absolute inset-x-0 bottom-7 z-20 flex flex-col items-center gap-2"
-      >
-        <span className="text-[9px] uppercase tracking-[0.35em] text-white/60">Scroll</span>
-        <span className="relative block h-10 w-px overflow-hidden bg-white/25">
-          <span className="scroll-cue-dot absolute left-0 top-0 block h-4 w-px bg-gold" />
-        </span>
-      </div>
     </section>
   );
 }

@@ -651,36 +651,6 @@
   }
 }
 
-/* --- Hero scroll cue ----------------------------------------------------- */
-
-@keyframes scroll-cue {
-  0% {
-    transform: translateY(-110%);
-    opacity: 0;
-  }
-  30% {
-    opacity: 1;
-  }
-  70% {
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(110%);
-    opacity: 0;
-  }
-}
-
-.scroll-cue-dot {
-  animation: scroll-cue 2.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-cue-dot {
-    animation: none;
-    opacity: 1;
-    transform: none;
-  }
-}
 
 /* --- Pointer flourish ----------------------------------------------------
    Two halves of one idea. A mouse gets a gold ring trailing the pointer; a

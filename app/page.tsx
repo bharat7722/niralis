@@ -87,7 +87,8 @@ export default function HomePage() {
             >
               <h3 className="font-display text-3xl text-primary">Aagman Confirmation</h3>
               <p className="mt-2 text-sm text-muted-foreground">
-                Tell us if you can come, and how many people are joining you.
+                Aapke aashirwad aur sneh ke bina yeh khushi adhoori hai. Kripya bataiye,
+                aap kitne sadasyon ke saath padhar rahe hain.
               </p>
               <span className="mt-5 inline-block text-xs uppercase tracking-[0.25em] text-gold transition-transform group-hover:translate-x-1">
                 Reply now →
