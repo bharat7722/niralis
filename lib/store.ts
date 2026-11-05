@@ -10,7 +10,6 @@ export type Rsvp = {
   email: string;
   attending: "yes" | "no";
   guests: number;
-  meal: string;
   message: string;
   createdAt: string;
 };

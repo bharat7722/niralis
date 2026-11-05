@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { addRsvp, type Rsvp } from "@/lib/store";
-import { appendToSheet } from "@/lib/sheets";
+import { appendToSheet, sheetDate } from "@/lib/sheets";
 
 function clean(value: unknown, max = 500): string {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
@@ -34,7 +34,6 @@ export async function POST(request: Request) {
     email: clean(body.email, 120),
     attending,
     guests: attending === "yes" ? guests : 0,
-    meal: clean(body.meal, 60) || "Vegetarian",
     message: clean(body.message, 1000),
     createdAt: new Date().toISOString(),
   };
@@ -45,15 +44,13 @@ export async function POST(request: Request) {
   const savedLocally = await addRsvp(rsvp);
 
   const sheet = await appendToSheet("RSVP", {
-    submittedAt: rsvp.createdAt,
+    submittedAt: sheetDate(rsvp.createdAt),
     name: rsvp.name,
     phone: rsvp.phone,
     email: rsvp.email,
     attending: rsvp.attending === "yes" ? "Yes" : "No",
     guests: rsvp.guests,
-    meal: rsvp.meal,
     message: rsvp.message,
-    id: rsvp.id,
   });
 
   // If nothing captured the reply, say so. Returning 201 here would show the

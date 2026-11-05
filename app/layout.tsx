@@ -4,6 +4,7 @@ import "./globals.css";
 import SiteHeader from "@/components/site-header";
 import SiteFooter from "@/components/site-footer";
 import BackToTop from "@/components/back-to-top";
+import RoseFall from "@/components/rose-fall";
 import PointerFlourish from "@/components/pointer-flourish";
 import Varak from "@/components/varak";
 
@@ -58,6 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <main className="flex-1">{children}</main>
           <SiteFooter />
         </div>
+        <RoseFall />
         <BackToTop />
         <PointerFlourish />
         <Varak />

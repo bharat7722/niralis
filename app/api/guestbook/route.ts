@@ -42,11 +42,11 @@ export async function POST(request: Request) {
   // development-only, so in production the sheet is what actually keeps a wish.
   const savedLocally = await addGuestbookEntry(entry);
 
+  // A wish has exactly two fields, so the Guestbook tab carries exactly two
+  // columns. The Apps Script keeps a column list per sheet name.
   const sheet = await appendToSheet("Guestbook", {
-    submittedAt: entry.createdAt,
     name: entry.name,
     message: entry.message,
-    id: entry.id,
   });
 
   if (!savedLocally && sheet !== "appended") {

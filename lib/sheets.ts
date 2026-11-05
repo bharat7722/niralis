@@ -22,6 +22,22 @@ export type SheetResult = "appended" | "not_configured" | "failed";
  *  form submit, and the row is already saved locally by the time we get here. */
 const TIMEOUT_MS = 10_000;
 
+/**
+ * A date a person can read at a glance: "12 January 2027".
+ *
+ * Pinned to Asia/Kolkata rather than the server's clock — this runs in UTC on
+ * a serverless host, so anything submitted late in the Indian evening would
+ * otherwise be filed under the previous day.
+ */
+export function sheetDate(iso: string): string {
+  return new Date(iso).toLocaleDateString("en-GB", {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    timeZone: "Asia/Kolkata",
+  });
+}
+
 export async function appendToSheet(
   sheet: string,
   row: Record<string, string | number>,
@@ -46,10 +62,30 @@ export async function appendToSheet(
     if (!response.ok) {
       console.error(
         `[sheets] ${sheet}: Apps Script replied ${response.status}. ` +
-          "The row is still saved locally.",
+          (response.status === 401 || response.status === 403
+            ? 'Set the deployment\'s "Who has access" to "Anyone", or check that ' +
+              "GOOGLE_SHEETS_WEBHOOK_URL points at the current deployment."
+            : "The row is not in the sheet."),
       );
       return "failed";
     }
+
+    // Apps Script answers 200 even when doPost rejects the payload — a bad
+    // token comes back as {ok:false} with a perfectly healthy status. Trusting
+    // the status alone would report a row as appended that never landed.
+    const body = (await response.json().catch(() => null)) as
+      | { ok?: boolean; error?: string }
+      | null;
+
+    if (!body?.ok) {
+      console.error(
+        `[sheets] ${sheet}: Apps Script rejected the row` +
+          (body?.error ? ` — ${body.error}` : " (unreadable reply)") +
+          ". A 'bad token' here means GOOGLE_SHEETS_TOKEN does not match TOKEN in the script.",
+      );
+      return "failed";
+    }
+
     return "appended";
   } catch (cause) {
     // Timeout, DNS, offline, a revoked deployment -- all the same from here:

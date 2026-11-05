@@ -21,9 +21,29 @@ type Particle = {
   maxLife: number;
   size: number;
   color: string;
+  /** dust is a speck, star twinkles, ribbon tumbles like paper confetti. */
+  kind: "dust" | "star" | "ribbon";
+  angle: number;
+  spin: number;
+  /** Ribbons only: phase of the edge-on flutter. */
+  flip: number;
 };
 
 const DUST = ["#fff6df", "#f6e3b0", "#e4bd63", "#d5a13c", "#bd8a2c"];
+const SPARK = ["#ffffff", "#fff6df", "#ffe9a8", "#f3c75a"];
+const RIBBON = ["#d5a13c", "#e9cd8d", "#7b2c3b", "#f3922a", "#fff6df"];
+
+/** Concave between the points, which is what reads as a sparkle. */
+function tracePoint(ctx: CanvasRenderingContext2D, r: number) {
+  ctx.beginPath();
+  ctx.moveTo(0, -r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.quadraticCurveTo(0, 0, 0, r);
+  ctx.quadraticCurveTo(0, 0, -r, 0);
+  ctx.quadraticCurveTo(0, 0, 0, -r);
+  ctx.closePath();
+  ctx.fill();
+}
 const MAX_PARTICLES = 520;
 
 export default function ScratchReveal({
@@ -78,9 +98,31 @@ export default function ScratchReveal({
 
       ctx.globalAlpha = 1 - t;
       ctx.fillStyle = p.color;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size * (1 - t * 0.45), 0, Math.PI * 2);
-      ctx.fill();
+
+      if (p.kind === "star") {
+        p.angle += p.spin;
+        // Twinkle, so a sparkle pulses instead of merely shrinking.
+        const twinkle = 0.55 + 0.45 * Math.abs(Math.sin(p.life * 0.22));
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        tracePoint(ctx, p.size * twinkle * (1 - t * 0.3));
+        ctx.restore();
+      } else if (p.kind === "ribbon") {
+        p.angle += p.spin;
+        p.flip += 0.19;
+        // Squashing the width is what sells paper turning edge-on.
+        const face = Math.abs(Math.cos(p.flip));
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillRect(-p.size * face, -p.size * 1.9, p.size * 2 * face, p.size * 3.8);
+        ctx.restore();
+      } else {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size * (1 - t * 0.45), 0, Math.PI * 2);
+        ctx.fill();
+      }
       alive.push(p);
     }
     ctx.globalAlpha = 1;
@@ -90,21 +132,39 @@ export default function ScratchReveal({
   }, []);
 
   const spawnDust = useCallback(
-    (x: number, y: number, count: number, spread: number) => {
+    (x: number, y: number, count: number, spread: number, festive = 0) => {
       if (reduced.current || particles.current.length > MAX_PARTICLES) return;
 
       for (let i = 0; i < count; i++) {
         const angle = Math.random() * Math.PI * 2;
         const speed = Math.random() * spread;
+
+        const roll = Math.random();
+        const kind: Particle["kind"] =
+          roll < festive * 0.55 ? "star" : roll < festive ? "ribbon" : "dust";
+
+        const lift = kind === "star" ? 2.1 : kind === "ribbon" ? 2.6 : 1.1;
         particles.current.push({
           x,
           y,
           vx: Math.cos(angle) * speed,
-          vy: Math.sin(angle) * speed - 1.1,
+          vy: Math.sin(angle) * speed - lift,
           life: 0,
-          maxLife: 28 + Math.random() * 26,
-          size: 0.9 + Math.random() * 2.3,
-          color: DUST[Math.floor(Math.random() * DUST.length)],
+          // Confetti and sparkles stay up well after the dust has settled.
+          maxLife:
+            kind === "ribbon" ? 70 + Math.random() * 40 : kind === "star" ? 52 + Math.random() * 34 : 28 + Math.random() * 26,
+          size:
+            kind === "ribbon" ? 3 + Math.random() * 3 : kind === "star" ? 2.8 + Math.random() * 3.6 : 0.9 + Math.random() * 2.3,
+          color:
+            kind === "ribbon"
+              ? RIBBON[Math.floor(Math.random() * RIBBON.length)]
+              : kind === "star"
+                ? SPARK[Math.floor(Math.random() * SPARK.length)]
+                : DUST[Math.floor(Math.random() * DUST.length)],
+          kind,
+          angle: Math.random() * Math.PI,
+          spin: (Math.random() - 0.5) * (kind === "ribbon" ? 0.3 : 0.12),
+          flip: Math.random() * Math.PI * 2,
         });
       }
       if (raf.current === null) raf.current = requestAnimationFrame(tick);
@@ -243,9 +303,21 @@ export default function ScratchReveal({
 
       if (withBurst && !reduced.current) {
         const { w, h } = size.current;
-        for (let i = 0; i < 26; i++) {
-          spawnDust(w * (0.12 + Math.random() * 0.76), h * (0.2 + Math.random() * 0.6), 3, 5.5);
-        }
+        // Two waves: the card erupts, then a lighter shower follows it.
+        const scatter = (festive: number, count: number, spread: number) => {
+          for (let i = 0; i < count; i++) {
+            spawnDust(
+              w * (0.06 + Math.random() * 0.88),
+              h * (0.12 + Math.random() * 0.76),
+              4,
+              spread,
+              festive,
+            );
+          }
+        };
+
+        scatter(0.72, 40, 7.5);
+        window.setTimeout(() => scatter(0.6, 24, 5.5), 190);
         setAnimate(true);
       }
 
@@ -381,7 +453,10 @@ export default function ScratchReveal({
         <div className={`w-full text-center ${animate ? "reveal-settle" : ""}`}>{children}</div>
 
         {animate && (
-          <span aria-hidden="true" className="polish-sweep pointer-events-none absolute inset-0 z-30" />
+          <>
+            <span aria-hidden="true" className="reveal-flash pointer-events-none absolute inset-0 z-30" />
+            <span aria-hidden="true" className="polish-sweep pointer-events-none absolute inset-0 z-30" />
+          </>
         )}
 
         {!revealed && !started && (

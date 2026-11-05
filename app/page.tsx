@@ -5,7 +5,6 @@ import ScratchReveal from "@/components/scratch-reveal";
 import Reveal from "@/components/reveal";
 import Hero from "@/components/hero";
 import Invitation from "@/components/invitation";
-import Jharokha from "@/components/jharokha";
 import InlayMosaic from "@/components/inlay-mosaic";
 import { homeGallery, site } from "@/lib/site";
 import Ornament from "@/components/ornament";
@@ -40,7 +39,7 @@ export default function HomePage() {
 
       <Invitation />
 
-      <Jharokha />
+      <InlayMosaic src="/images/couple-night-lights.jpg" alt="Harsh and Nirali together" />
 
       <section className="bg-background py-20">
         <div className="mx-auto max-w-5xl px-6">
@@ -76,7 +75,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <InlayMosaic src="/images/couple-night-lights.jpg" alt="Harsh and Nirali together" />
 
       <section className="bg-paper py-20">
         <div className="mx-auto grid max-w-4xl gap-6 px-6 sm:grid-cols-2">
@@ -100,12 +98,12 @@ export default function HomePage() {
               href="/guestbook"
               className="group block h-full rounded-3xl border border-gold/30 bg-card p-10 text-center transition-all hover:-translate-y-0.5 hover:border-gold/60 active:scale-[0.99]"
             >
-              <h3 className="font-display text-3xl text-primary">Leave a Wish</h3>
+              <h3 className="font-display text-3xl text-primary">Leave a Blessing</h3>
               <p className="mt-2 text-sm text-muted-foreground">
                 Write a wish, blessing or piece of advice for {site.groom} &amp; {site.bride}.
               </p>
               <span className="mt-5 inline-block text-xs uppercase tracking-[0.25em] text-gold transition-transform group-hover:translate-x-1">
-                Write a wish →
+                Write a blessing →
               </span>
             </Link>
           </Reveal>

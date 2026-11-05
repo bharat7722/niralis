@@ -28,11 +28,16 @@ In that sheet: **Extensions → Apps Script**. Delete whatever is in
 // Change it to something only you know before deploying.
 const TOKEN = 'change-me-to-something-random';
 
-// Column order. Add a key here and in the route handler to add a column.
-const COLUMNS = [
-  'submittedAt', 'name', 'phone', 'email',
-  'attending', 'guests', 'meal', 'message', 'id',
-];
+// Column order, per tab. A wish only has two fields, so the Guestbook tab
+// gets two columns -- sharing one list across both tabs is what left it with
+// empty phone/email/attending/guests columns.
+const COLUMNS = {
+  RSVP: [
+    'submittedAt', 'name', 'phone', 'email',
+    'attending', 'guests', 'message',
+  ],
+  Guestbook: ['name', 'message'],
+};
 
 function doPost(e) {
   try {
@@ -45,18 +50,20 @@ function doPost(e) {
 
     const book = SpreadsheetApp.getActiveSpreadsheet();
     const name = payload.sheet || 'RSVP';
+    const columns = COLUMNS[name] || COLUMNS.RSVP;
+
     let tab = book.getSheetByName(name);
     if (!tab) tab = book.insertSheet(name);
 
     // Header row, written once, so a fresh sheet is readable immediately.
     if (tab.getLastRow() === 0) {
-      tab.appendRow(COLUMNS);
-      tab.getRange(1, 1, 1, COLUMNS.length).setFontWeight('bold');
+      tab.appendRow(columns);
+      tab.getRange(1, 1, 1, columns.length).setFontWeight('bold');
       tab.setFrozenRows(1);
     }
 
     const row = payload.row || {};
-    tab.appendRow(COLUMNS.map(function (key) {
+    tab.appendRow(columns.map(function (key) {
       return row[key] === undefined || row[key] === null ? '' : row[key];
     }));
 
@@ -117,9 +124,13 @@ If it does not, the dev server log says why — `[sheets] RSVP: ...`.
 
 ## Changing the columns
 
-Edit `COLUMNS` in the script **and** the object passed to `appendToSheet` in
-[`app/api/rsvp/route.ts`](app/api/rsvp/route.ts). Keys that exist in one and
-not the other come through blank rather than breaking.
+Edit the tab's list in `COLUMNS` in the script **and** the object passed to
+`appendToSheet` in the matching route handler. Keys that exist in one and not
+the other come through blank rather than breaking.
+
+The header row is only written to an empty tab. After changing a tab's
+columns, delete that tab (or clear every row including the header) so the
+script writes the new header on the next submission.
 
 ## Re-deploying after editing the script
 

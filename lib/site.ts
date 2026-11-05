@@ -24,11 +24,11 @@ export const navLinks = [
   { href: "/details", label: "Details" },
   { href: "/gallery", label: "Gallery" },
   { href: "/rsvp", label: "Aagman Confirmation" },
-  { href: "/guestbook", label: "Leave a Wish" },
+  { href: "/guestbook", label: "Leave a Blessing" },
 ] as const;
 
 export const homeGallery = [
-  { src: "/images/hero-mandap.jpg", alt: "Harsh and Nirali" },
+  { src: "/images/courtyard-embrace.jpg", alt: "Harsh and Nirali embracing" },
   { src: "/images/couple-night-lights.jpg", alt: "Harsh and Nirali together" },
   { src: "/images/beach-hands.jpg", alt: "Harsh and Nirali engagement" },
   { src: "/images/beach-sunset.jpg", alt: "Harsh and Nirali at the beach" },
@@ -37,7 +37,6 @@ export const homeGallery = [
 ];
 
 export const gallery = [
-  { src: "/images/hero-mandap.jpg", alt: "Harsh and Nirali", caption: "Two hearts, one story" },
   { src: "/images/couple-night-lights.jpg", alt: "Harsh and Nirali together", caption: "Together is our favourite place" },
   { src: "/images/beach-hands.jpg", alt: "Harsh and Nirali engagement", caption: "The beginning of forever" },
   { src: "/images/beach-sunset.jpg", alt: "Harsh and Nirali at the beach", caption: "Our beautiful journey" },
@@ -82,7 +81,7 @@ export const storyChapters = [
     kicker: "2027",
     title: "Forever Begins",
     body: "And now, surrounded by the people we love most, we begin our forever.",
-    image: "/images/hero-mandap.jpg",
+    image: "/images/kurta-courtyard.jpg",
     focus: "50% 30%",
   },
 ];

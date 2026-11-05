@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import type { GuestbookEntry } from "@/lib/store";
 import { site } from "@/lib/site";
 import Ornament from "@/components/ornament";
+import Celebration from "@/components/celebration";
 
 const FIELD =
   "w-full rounded-lg border border-input bg-background px-4 py-3 text-base text-foreground outline-none focus:border-gold focus:ring-1 focus:ring-gold/40";
@@ -22,6 +23,7 @@ export default function GuestbookPage() {
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const load = useCallback(async () => {
@@ -60,6 +62,7 @@ export default function GuestbookPage() {
       }
       setName("");
       setMessage("");
+      setSent(true);
       await load();
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Something went wrong.");
@@ -73,7 +76,7 @@ export default function GuestbookPage() {
       <div className="mx-auto max-w-2xl px-6 py-20">
         <div className="text-center">
           <p className="text-xs uppercase tracking-[0.3em] text-gold">Wishes &amp; blessings</p>
-          <h1 data-varak className="mt-3 font-display text-5xl text-primary">Leave a Wish</h1>
+          <h1 data-varak className="mt-3 font-display text-5xl text-primary">Leave a Blessing</h1>
           <Ornament className="mx-auto mt-6" />
           <p className="mx-auto mt-6 max-w-md text-sm leading-relaxed text-muted-foreground">
             Write a wish, a blessing, or a bit of advice for {site.groom} &amp; {site.bride}.
@@ -81,42 +84,62 @@ export default function GuestbookPage() {
           </p>
         </div>
 
-        <form
-          onSubmit={handleSubmit}
-          className="mt-12 rounded-3xl border border-gold/30 bg-card p-6 sm:p-8"
-        >
-          <label className="block">
-            <span className={LABEL}>Your name</span>
-            <input
-              maxLength={100}
-              className={FIELD}
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
-          </label>
-          <label className="mt-4 block">
-            <span className={LABEL}>Your wish or blessing</span>
-            <textarea
-              maxLength={1000}
-              rows={3}
-              className={FIELD}
-              placeholder="Share a wish, a memory, or a blessing…"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-          </label>
-
-          {error && <p className="mt-4 text-center text-sm text-destructive">{error}</p>}
-
-          <button
-            type="submit"
-            disabled={sending}
-            className="mt-5 w-full rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+        {sent ? (
+          <div className="mt-12 rounded-3xl border border-gold/30 bg-card p-10 text-center">
+            <Celebration />
+            <h2 className="font-display text-3xl text-primary">Thank you</h2>
+            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+              Your blessing is with {site.groom} &amp; {site.bride} — you will find it below.
+            </p>
+            <Ornament className="mx-auto mt-6" />
+            {/* A guestbook takes as many blessings as people care to leave,
+                so this is not a dead end the way the RSVP's thank-you is. */}
+            <button
+              type="button"
+              onClick={() => setSent(false)}
+              className="mt-6 text-[11px] uppercase tracking-[0.25em] text-muted-foreground transition-colors hover:text-primary"
+            >
+              Leave another
+            </button>
+          </div>
+        ) : (
+          <form
+            onSubmit={handleSubmit}
+            className="mt-12 rounded-3xl border border-gold/30 bg-card p-6 sm:p-8"
           >
-            {sending ? "Sending…" : "Send Your Wish"}
-          </button>
-        </form>
+            <label className="block">
+              <span className={LABEL}>Your name</span>
+              <input
+                maxLength={100}
+                className={FIELD}
+                placeholder="Your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </label>
+            <label className="mt-4 block">
+              <span className={LABEL}>Your wish or blessing</span>
+              <textarea
+                maxLength={1000}
+                rows={3}
+                className={FIELD}
+                placeholder="Share a wish, a memory, or a blessing…"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+              />
+            </label>
+
+            {error && <p className="mt-4 text-center text-sm text-destructive">{error}</p>}
+
+            <button
+              type="submit"
+              disabled={sending}
+              className="mt-5 w-full rounded-full bg-primary px-6 py-3 text-sm uppercase tracking-[0.2em] text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50"
+            >
+              {sending ? "Sending…" : "Send Your Wish"}
+            </button>
+          </form>
+        )}
 
         <div className="mt-12 space-y-5">
           {entries === null && (

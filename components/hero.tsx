@@ -129,15 +129,21 @@ export default function Hero() {
       ref={root}
       className="relative flex min-h-[88vh] items-center justify-center overflow-hidden"
     >
-      <Image
-        data-hero="image"
-        src="/images/hero-mandap.jpg"
-        alt="Harsh and Nirali under a floral archway at sunset"
-        fill
-        priority
-        sizes="100vw"
-        className="absolute inset-0 h-full w-full object-cover"
-      />
+      {/* The wrapper is what GSAP scales, and it sits slightly outside the
+          section on every side. A blur samples beyond the element it is
+          applied to, so a blurred image pinned to inset-0 fades out along its
+          own edges; overflowing the section and letting it clip avoids that
+          without touching the ken-burns transform. */}
+      <div data-hero="image" className="absolute -inset-[2.5%]">
+        <Image
+          src="/images/hero-mandap.jpg"
+          alt="Harsh and Nirali under a floral archway at sunset"
+          fill
+          priority
+          sizes="110vw"
+          className="object-cover blur-[1.5px]"
+        />
+      </div>
       <div className="absolute inset-0 bg-gradient-to-b from-primary/35 via-primary/25 to-primary/60" />
       {/* Opaque only while the overture runs; invisible otherwise. */}
       <div data-hero="veil" aria-hidden="true" className="absolute inset-0 bg-primary opacity-0" />
@@ -169,9 +175,12 @@ export default function Hero() {
         <div data-hero="rule" className="mx-auto my-7 h-px w-40 bg-white/40" />
         <p
           data-hero="meta"
-          className="text-sm font-semibold uppercase tracking-[0.3em] text-white drop-shadow-sm"
+          className="text-[14px] font-semibold uppercase tracking-[0.28em] text-white drop-shadow-sm"
         >
-          {site.dateAndPlace}
+          {site.dateLabel}
+          {/* Held at the smaller size while the date steps up, so the date
+              leads and the place sits under it. */}
+          <span className="mt-1.5 block text-xs">{site.placeLabel}</span>
         </p>
         <p data-hero="tag" className="mt-3 text-xs uppercase tracking-[0.3em] text-gold">
           {site.hashtag}

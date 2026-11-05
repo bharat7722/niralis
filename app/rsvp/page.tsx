@@ -10,8 +10,6 @@ const FIELD =
 const LABEL = "mb-1.5 block text-xs uppercase tracking-[0.2em] text-muted-foreground";
 const HELP = "mt-1.5 block text-[11px] leading-relaxed text-muted-foreground/80";
 
-const MEALS = ["Vegetarian", "Jain Vegetarian", "Other / Please contact me"];
-
 export default function RsvpPage() {
   const [form, setForm] = useState({
     name: "",
@@ -19,7 +17,6 @@ export default function RsvpPage() {
     email: "",
     attending: "",
     guests: "",
-    meal: MEALS[0],
     message: "",
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
@@ -167,22 +164,6 @@ export default function RsvpPage() {
                     onChange={(e) => set("guests")(e.target.value)}
                   />
                   <span className={HELP}>Including yourself.</span>
-                </label>
-
-                <label className="block">
-                  <span className={LABEL}>Meal preference</span>
-                  <select
-                    name="meal"
-                    className={FIELD}
-                    value={form.meal}
-                    onChange={(e) => set("meal")(e.target.value)}
-                  >
-                    {MEALS.map((meal) => (
-                      <option key={meal} value={meal}>
-                        {meal}
-                      </option>
-                    ))}
-                  </select>
                 </label>
               </>
             )}
