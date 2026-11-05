@@ -120,7 +120,6 @@ Restart `npm run dev`. `.env.local` is already gitignored by `create-next-app`
 Submit a test RSVP. A row should appear in the sheet within a second or two.
 If it does not, the dev server log says why — `[sheets] RSVP: ...`.
 
----
 
 ## Changing the columns
 
