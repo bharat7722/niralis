@@ -5,6 +5,7 @@ import ScratchReveal from "@/components/scratch-reveal";
 import Reveal from "@/components/reveal";
 import Hero from "@/components/hero";
 import Invitation from "@/components/invitation";
+import Jharokha from "@/components/jharokha";
 import InlayMosaic from "@/components/inlay-mosaic";
 import { homeGallery, site } from "@/lib/site";
 import Ornament from "@/components/ornament";
@@ -40,6 +41,8 @@ export default function HomePage() {
       <Invitation />
 
       <InlayMosaic src="/images/couple-night-lights.jpg" alt="Harsh and Nirali together" />
+
+      <Jharokha />
 
       <section className="bg-background py-20">
         <div className="mx-auto max-w-5xl px-6">
